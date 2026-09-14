@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atelier PaulineB — Planning V3</title>
+<style>
+:root{--a:#d58eaa;--bg:#f7f1f4;--ink:#33282d;--muted:#88777e;--line:#eadde3;--soft:#fff7fa}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+.app{max-width:440px;margin:auto;background:#fff;min-height:100vh}.top{text-align:center;padding:20px;border-bottom:1px solid var(--line)}
+.logo{font:26px Georgia,serif}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.nav h2{font-size:17px;margin:0;text-transform:capitalize}.icon{width:44px;height:44px;border:0;border-radius:13px;background:#f4edf0;font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:0 10px}.wd{text-align:center;color:var(--muted);font-size:10px;padding:4px}.cell{min-height:57px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;padding:6px;cursor:pointer}.cell.sel{border:2px solid var(--a)}.cell.today .num{background:var(--a);color:#fff;border-radius:8px;padding:2px 5px}.num{font-size:12px;font-weight:800}.dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#66a978;margin-top:8px}.dot.busy{background:#c9647c}
+.card{margin:16px;border:1px solid var(--line);border-radius:18px;padding:16px}.card h3{margin:0 0 9px;font-size:16px}.appt{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:11px 0;border-bottom:1px solid #f1e8ec}.appt:last-child{border-bottom:0}.appt small{color:var(--muted)}.tag{font-size:10px;font-weight:800;padding:6px 8px;border-radius:9px;background:#f9e5eb;color:#ae536b}.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:13px}.btn{border:0;border-radius:13px;padding:13px;font-weight:800;font-size:14px}.main{background:var(--a);color:#fff}.soft{background:#f4edf0;color:#46373e}.danger{background:#fae7eb;color:#ad5369}.form{display:none}.form.show{display:block}.field{margin:10px 0}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input,.field select{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;font-size:16px;background:white}.ig{display:none}.ig.show{display:block}.story{background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:20px;text-align:center}.story h2{font:27px Georgia,serif;margin:0}.story .line{padding:10px 4px;border-bottom:1px solid var(--line);font-size:13px}.story .free{font-weight:800}.hint{text-align:center;color:var(--muted);font-size:11px;margin-top:9px}
+</style>
+<link rel="manifest" href="./manifest.webmanifest"><meta name="theme-color" content="#d58eaa"></head>
+<body><main class="app">
+<header class="top"><div class="logo">Atelier PaulineB</div><div class="sub">Planning rendez-vous · V3</div></header>
+<div class="nav"><button class="icon" id="prev">‹</button><h2 id="month"></h2><button class="icon" id="next">›</button></div>
+<div class="grid" id="cal"></div>
+<section class="card"><h3 id="selectedTitle"></h3><div id="list"></div>
+<div class="actions"><button class="btn main" id="newBtn">＋ Ajouter</button><button class="btn soft" id="igBtn">📸 Instagram</button></div>
+<div class="hint">Les données restent sur cet appareil.</div></section>
+
+<section class="card form" id="formCard"><h3 id="formTitle">Nouveau rendez-vous</h3>
+<form id="form"><div class="field"><label>Date</label><input id="fdate" type="date" required></div>
+<div class="field"><label>Heure</label><input id="ftime" type="time" required></div>
+<div class="field"><label>Prestation</label><select id="fservice"><option>Semi-permanent</option><option>Pose gel</option><option>Remplissage</option><option>Dépose + soin</option><option>Nail art</option></select></div>
+<div class="field"><label>Cliente</label><input id="fclient" placeholder="Nom de la cliente"></div>
+<div class="actions"><button class="btn main">Enregistrer</button><button class="btn soft" type="button" id="cancel">Annuler</button></div>
+</form></section>
+
+<section class="card ig" id="igCard"><h3>Story Instagram</h3><div class="story" id="story"></div><button class="btn soft" style="width:100%;margin-top:10px" id="closeIg">Fermer</button></section>
+<script>
+const M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"], W=["L","M","M","J","V","S","D"];
+const demo=[["2026-09-14","09:00","Semi-permanent","Cliente 1"],["2026-09-14","14:00","Pose gel","Cliente 2"],["2026-09-16","10:30","Remplissage","Cliente 3"],["2026-09-18","16:00","Semi-permanent","Cliente 4"]];
+let events=JSON.parse(localStorage.getItem("paulineb_events")||"null")||demo.map(x=>({d:x[0],t:x[1],s:x[2],c:x[3]}));
+let selected=new Date(2026,8,14), view=new Date(2026,8,1), editing=-1;
+const pad=n=>String(n).padStart(2,"0"), key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function save(){localStorage.setItem("paulineb_events",JSON.stringify(events))}
+function render(){
+ let y=view.getFullYear(),m=view.getMonth();month.textContent=M[m]+" "+y;cal.innerHTML=W.map(x=>`<div class="wd">${x}</div>`).join("");
+ let first=(new Date(y,m,1).getDay()+6)%7,total=new Date(y,m+1,0).getDate();for(let i=0;i<first;i++)cal.insertAdjacentHTML("beforeend","<div></div>");
+ for(let n=1;n<=total;n++){let d=new Date(y,m,n),k=key(d),ev=events.filter(e=>e.d===k);cal.insertAdjacentHTML("beforeend",`<button type="button" class="cell ${k===key(selected)?"sel ":""}${k===key(new Date())?"today":""}" data-k="${k}"><span class="num">${n}</span>${ev.length?`<br><span class="dot ${ev.length>1?"busy":""}"></span>`:""}</button>`)}
+ document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{selected=new Date(b.dataset.k+"T12:00:00");render()});
+ let ev=events.map((e,i)=>({...e,i})).filter(e=>e.d===key(selected)).sort((a,b)=>a.t.localeCompare(b.t));
+ selectedTitle.textContent=selected.getDate()+" "+M[selected.getMonth()]+" "+selected.getFullYear();
+ list.innerHTML=ev.length?ev.map(e=>`<div class="appt"><div><b>${e.t}</b> · ${e.s}<br><small>${e.c||"Cliente"}</small></div><button type="button" class="tag" data-edit="${e.i}">Modifier</button></div>`).join(""):`<div class="appt"><span style="color:#4e8d62;font-weight:700">Journée disponible</span></div>`;
+ document.querySelectorAll("[data-edit]").forEach(b=>b.onclick=()=>openEdit(+b.dataset.edit));
+}
+function openEdit(i){editing=i;let e=events[i];formTitle.textContent="Modifier le rendez-vous";fdate.value=e.d;ftime.value=e.t;fservice.value=e.s;fclient.value=e.c||"";formCard.classList.add("show");window.scrollTo(0,document.body.scrollHeight)}
+newBtn.onclick=()=>{editing=-1;formTitle.textContent="Nouveau rendez-vous";fdate.value=key(selected);ftime.value="10:00";fservice.value="Semi-permanent";fclient.value="";formCard.classList.add("show")};
+cancel.onclick=()=>formCard.classList.remove("show");
+form.onsubmit=e=>{e.preventDefault();let obj={d:fdate.value,t:ftime.value,s:fservice.value,c:fclient.value.trim()};if(editing<0)events.push(obj);else events[editing]=obj;save();selected=new Date(obj.d+"T12:00:00");view=new Date(selected.getFullYear(),selected.getMonth(),1);formCard.classList.remove("show");render()};
+prev.onclick=()=>{view.setMonth(view.getMonth()-1);render()};next.onclick=()=>{view.setMonth(view.getMonth()+1);render()};
+igBtn.onclick=()=>{let prefix=`${view.getFullYear()}-${pad(view.getMonth()+1)}`,ev=events.filter(e=>e.d.startsWith(prefix)).sort((a,b)=>(a.d+a.t).localeCompare(b.d+b.t)),map={};ev.forEach(e=>(map[e.d]??=[]).push(e));let body=Object.entries(map).map(([d,a])=>{let z=new Date(d+"T12:00:00");return `<div class="line"><b>${z.getDate()} ${M[z.getMonth()]}</b><br><span class="free">${a.map(e=>e.t).join(" • ")}</span></div>`}).join("");story.innerHTML=`<h2>Atelier PaulineB</h2><p><b>DISPONIBILITÉS</b><br>${M[view.getMonth()].toUpperCase()} ${view.getFullYear()}</p>${body||"<div class='line'>Aucun créneau renseigné</div>"}<p>💌 Réservation en message privé</p>`;igCard.classList.add("show")};
+closeIg.onclick=()=>igCard.classList.remove("show");render();
+</script></main><script>if("serviceWorker" in navigator) navigator.serviceWorker.register("./sw.js");</script></body></html>
