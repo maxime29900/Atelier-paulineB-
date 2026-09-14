@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Atelier PaulineB — Disponibilités V10</title>
+<style>
+:root{--a:#d58eaa;--ink:#33282d;--muted:#88777e;--line:#eadde3;--soft:#fff7fa;--ok:#e5f4e9;--okink:#397a4f}
+*{box-sizing:border-box}body{margin:0;background:#f6f0f3;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink)}
+.app{max-width:440px;margin:auto;background:#fff;min-height:100vh}.top{text-align:center;padding:20px;border-bottom:1px solid var(--line)}
+.logo{font:27px Georgia,serif}.sub{font-size:11px;color:var(--muted);margin-top:3px}
+.nav{display:flex;align-items:center;justify-content:space-between;padding:14px 16px}.nav h2{font-size:17px;margin:0;text-transform:capitalize}.icon{width:44px;height:44px;border:0;border-radius:13px;background:#f4edf0;font-size:22px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:0 10px}.wd{text-align:center;color:var(--muted);font-size:10px;padding:4px}.cell{min-height:62px;border:1px solid var(--line);border-radius:12px;background:#fff;text-align:left;padding:6px;cursor:pointer}.cell.sel{border:2px solid var(--a)}.num{font-size:12px;font-weight:800}.count{display:block;margin-top:6px;background:var(--ok);color:var(--okink);font-size:8px;font-weight:800;border-radius:7px;padding:4px;line-height:1.2}
+.card{margin:16px;border:1px solid var(--line);border-radius:18px;padding:16px}.card h3{margin:0 0 5px;font-size:16px}.hint{font-size:11px;color:var(--muted)}
+.slots{display:flex;flex-direction:column;gap:8px;margin-top:13px}.slot{display:flex;align-items:center;justify-content:space-between;padding:11px 12px;border:1px solid #cfe7d5;border-radius:11px;background:var(--ok);color:var(--okink);font-weight:800;font-size:13px}.remove{border:0;background:#fff;border-radius:8px;color:#8b6975;padding:6px 8px;font-weight:700}
+.actions{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin-top:14px}.btn{border:0;border-radius:13px;padding:13px;font-size:14px;font-weight:800}.main{background:var(--a);color:#fff}.soft{background:#f4edf0;color:#46373e}
+.form{display:none}.form.show{display:block}.field{margin:10px 0}.field label{display:block;font-size:11px;color:var(--muted);margin-bottom:5px}.field input{width:100%;padding:12px;border:1px solid var(--line);border-radius:11px;font-size:16px}
+.quick{display:flex;gap:7px;flex-wrap:wrap;margin-top:10px}.quick button{border:1px solid var(--line);background:#fff;padding:8px 10px;border-radius:9px;font-size:11px}
+.ig{display:none}.ig.show{display:block}.story{width:100%;max-width:100%;box-sizing:border-box;overflow:hidden;background:var(--soft);border:1px solid var(--line);border-radius:16px;padding:16px;text-align:center}.storytitle{font:27px Georgia,serif}.storysub{font-size:10px;font-weight:900;margin:3px 0 10px}.igweek,.iggrid{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:3px;width:100%;box-sizing:border-box}.igweek{color:var(--muted);font-size:8px;font-weight:800}.iggrid{margin-top:3px}.igday{min-width:0;min-height:62px;box-sizing:border-box;border:1px solid var(--line);border-radius:7px;background:#fff;padding:4px;text-align:left;overflow:hidden}.igday.empty{border:0;background:transparent}.igdate{font-size:9px;font-weight:900}.igtimes{display:flex;flex-direction:column;gap:2px;margin-top:3px;min-width:0}.igtimes span{font-size:7px;background:#e2f2e6;color:#397a4f;border-radius:3px;padding:2px;font-weight:800;white-space:normal;overflow-wrap:anywhere;word-break:break-word}.igfree{font-size:6px;color:#397a4f;margin-top:8px;font-weight:800}.igfoot{font-size:9px;font-weight:700;margin-top:9px}
+</style>
+
+<style>
+:root{
+ --green:#dfeedd;--greenText:#477c52;
+ --pink:#f6cbd8;--pinkText:#9b4e67;
+ --lilac:#dfcff2;--lilacText:#73529a;
+ --beige:#f0dcc2;--beigeText:#966b42;
+}
+.type-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0}
+.type-option{border:2px solid transparent;border-radius:14px;padding:10px 12px;text-align:left;font-weight:700;cursor:pointer}
+.type-option.selected{border-color:#9b4e67;box-shadow:0 0 0 2px rgba(155,78,103,.08)}
+.type-all{background:var(--green);color:var(--greenText)}
+.type-semi{background:var(--pink);color:var(--pinkText)}
+.type-gainage{background:var(--lilac);color:var(--lilacText)}
+.type-jap{background:var(--beige);color:var(--beigeText)}
+.slotrow{display:flex;align-items:center;gap:10px;padding:10px;border-radius:14px;margin:7px 0}
+.slotdot{width:15px;height:15px;border-radius:50%;flex:0 0 15px}
+.slotinfo{flex:1;min-width:0}
+.slottime{font-weight:800;font-size:18px}
+.slottype{font-size:13px;opacity:.85}
+.igwrap{width:100%;max-width:100%;overflow:hidden}
+.story{width:100%;box-sizing:border-box;overflow:hidden}
+.iggrid{grid-template-columns:repeat(7,minmax(0,1fr))!important}
+.igday{min-width:0!important;overflow:hidden!important;box-sizing:border-box!important}
+.igtimes span{font-size:10px!important;white-space:normal!important;overflow-wrap:anywhere!important}
+@media(max-width:600px){
+ .type-grid{grid-template-columns:1fr}
+}
+</style>
+<style>
+.iglegend{margin:28px auto 0;max-width:720px;background:rgba(255,255,255,.72);border:1px solid #eadde3;border-radius:18px;padding:18px;text-align:left;font-size:18px;line-height:1.9}
+.iglegend>div{display:flex;align-items:center;gap:10px}
+.iglegend .dot{display:inline-block;width:16px;height:16px;border-radius:50%;flex:0 0 16px}
+.iglegend .all{background:#9fba91}.iglegend .semi{background:#e88da8}.iglegend .gainage{background:#ad8bd6}.iglegend .jap{background:#d8b995}
+.igtimes span.type-all{background:#dfeedd;color:#477c52}.igtimes span.type-semi{background:#f6cbd8;color:#9b4e67}.igtimes span.type-gainage{background:#dfcff2;color:#73529a}.igtimes span.type-jap{background:#f0dcc2;color:#966b42}
+</style></head>
+<body><main class="app">
+<header class="top"><div class="logo">Atelier PaulineB</div><div class="sub">Créneaux disponibles · V10</div></header>
+<div class="nav"><button class="icon" id="prev">‹</button><h2 id="month"></h2><button class="icon" id="next">›</button></div>
+<div class="grid" id="cal"></div>
+<section class="card">
+<h3 id="dayTitle"></h3><div class="hint">Ajoute une plage disponible avec une durée libre. Exemple : 9h00 → 12h30.</div>
+<div id="slots"></div>
+<div class="actions"><button class="btn main" id="add">＋ Ajouter une plage</button><button class="btn soft" id="ig">📸 Instagram</button></div>
+</section>
+<section class="card form" id="formCard"><h3>Nouvelle disponibilité</h3>
+<form id="form"><div class="field"><label>Date</label><input id="fdate" type="date" required></div>
+<div class="field"><label>Début</label><input id="fstart" type="time" required></div>
+<div class="field"><label>Fin</label><input id="fend" type="time" required></div>
+<div class="quick"><button type="button" data-dur="60">+ 1 h</button><button type="button" data-dur="90">+ 1 h 30</button><button type="button" data-dur="120">+ 2 h</button><button type="button" data-dur="150">+ 2 h 30</button></div>
+<div class="actions"><button class="btn main">Ajouter</button><button class="btn soft" type="button" id="cancel">Annuler</button></div></form></section>
+<section class="card ig" id="igCard"><h3>Story Instagram</h3><div class="hint" style="margin-bottom:10px">Le visuel reprend exactement les créneaux enregistrés dans le calendrier.</div><div class="story" id="story"></div><div class="actions" style="margin-top:10px"><button class="btn main" id="exportInsta">📸 Enregistrer la photo</button><button class="btn soft" id="close">Fermer</button></div></section>
+<script>
+const M=["janvier","février","mars","avril","mai","juin","juillet","août","septembre","octobre","novembre","décembre"],W=["L","M","M","J","V","S","D"];
+const demo=["2026-09-14|09:00|12:30","2026-09-14|14:00|15:30","2026-09-16|10:00|13:00","2026-09-18|09:00|10:30","2026-09-18|14:00|18:00"];
+let slots=JSON.parse(localStorage.getItem("paulineb_availability")||"null")||demo;
+let selected=new Date(2026,8,14),view=new Date(2026,8,1);
+const pad=n=>String(n).padStart(2,"0"),key=d=>`${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+function save(){localStorage.setItem("paulineb_availability",JSON.stringify(slots))}
+function render(){
+ const y=view.getFullYear(),m=view.getMonth();month.textContent=M[m]+" "+y;cal.innerHTML=W.map(x=>`<div class="wd">${x}</div>`).join("");
+ const first=(new Date(y,m,1).getDay()+6)%7,total=new Date(y,m+1,0).getDate();
+ for(let i=0;i<first;i++)cal.insertAdjacentHTML("beforeend","<div></div>");
+ for(let n=1;n<=total;n++){let d=new Date(y,m,n),k=key(d),a=slots.filter(x=>x.startsWith(k+"|"));cal.insertAdjacentHTML("beforeend",`<button type="button" class="cell ${k===key(selected)?"sel":""}" data-k="${k}"><span class="num">${n}</span>${a.length?`<span class="count">${a.length} plage${a.length>1?"s":""}</span>`:""}</button>`)}
+ document.querySelectorAll("[data-k]").forEach(b=>b.onclick=()=>{selected=new Date(b.dataset.k+"T12:00:00");render()});
+ dayTitle.textContent=`${selected.getDate()} ${M[selected.getMonth()]} ${selected.getFullYear()}`;
+ let a=slots.filter(x=>x.startsWith(key(selected)+"|")).sort();
+ slotsEl.innerHTML=a.length?`<div class="slots"><div id="slotList"></div></div>`}).join("")}</div>`:`<div class="hint" style="margin-top:12px">Aucune disponibilité enregistrée.</div>`;
+ document.querySelectorAll("[data-remove]").forEach(b=>b.onclick=()=>{slots=slots.filter(x=>x!==b.dataset.remove);save();render()});
+}
+prev.onclick=()=>{view.setMonth(view.getMonth()-1);render()};next.onclick=()=>{view.setMonth(view.getMonth()+1);render()};
+add.onclick=()=>{fdate.value=key(selected);fstart.value="09:00";fend.value="12:00";formCard.classList.add("show");fstart.focus()};
+cancel.onclick=()=>formCard.classList.remove("show");
+document.querySelectorAll("[data-dur]").forEach(b=>b.onclick=()=>{if(!fstart.value)return;let [h,m]=fstart.value.split(":").map(Number),d=Number(b.dataset.dur),total=h*60+m+d;if(total>1439)total=1439;fend.value=`${pad(Math.floor(total/60))}:${pad(total%60)}`});
+form.onsubmit=e=>{e.preventDefault();if(fstart.value>=fend.value){alert("L'heure de fin doit être après l'heure de début.");return}let v=fdate.value+"|"+fstart.value+"|"+fend.value;if(!slots.includes(v))slots.push(v);save();selected=new Date(fdate.value+"T12:00:00");view=new Date(selected.getFullYear(),selected.getMonth(),1);formCard.classList.remove("show");render()};
+function getMonthSlots(y,m){
+ const prefix=`${y}-${pad(m+1)}`;
+ return slots.filter(x=>x.startsWith(prefix+"|"));
+}
+function normalizeSlot(v){
+ const p=v.split("|");
+ return {date:p[0],start:p[1]||"",type:(p[2]&&/^(all|semi|gainage|jap)$/.test(p[2]))?p[2]:"all"};
+}
+function renderSlotList(){
+ const list=document.getElementById("slotList");
+ if(!list) return;
+ const y=view.getFullYear(),m=view.getMonth(),k=key(selected);
+ const arr=slots.filter(v=>v.startsWith(k+"|")).map(normalizeSlot).sort((a,b)=>a.start.localeCompare(b.start));
+ list.innerHTML=arr.length?arr.map((x,i)=>{
+   const t=typeInfo(x.type);
+   return `<div class="slotrow ${t.cls}"><span class="slotdot" style="background:${t.dot}"></span><div class="slotinfo"><div class="slottime">${x.start}</div><div class="slottype">${t.label}</div></div><button class="btn soft" onclick="removeSlot(${i})">Supprimer</button></div>`;
+ }).join(""):`<div class="hint">Aucun créneau enregistré pour cette journée.</div>`;
+}
+function removeSlot(i){
+ const k=key(selected);
+ const arr=slots.filter(v=>v.startsWith(k+"|"));
+ arr.sort();
+ const target=arr[i];
+ slots=slots.filter(v=>v!==target);
+ save();
+ render();
+ renderSlotList();
+}
+function buildInstagramPreview(y,m){
+ const first=(new Date(y,m,1).getDay()+6)%7,total=new Date(y,m+1,0).getDate();
+ let cells="";
+ for(let i=0;i<first;i++)cells+=`<div class="igday empty"></div>`;
+ for(let n=1;n<=total;n++){
+   const d=new Date(y,m,n),k=key(d);
+   const a=slots.filter(v=>v.startsWith(k+"|")).map(normalizeSlot).sort((a,b)=>a.start.localeCompare(b.start));
+   cells+=`<div class="igday"><div class="igdate">${n}</div>${a.length?`<div class="igtimes">${a.map(x=>{const t=typeInfo(x.type);return `<span class="${t.cls}">${x.start}</span>`}).join("")}</div>`:""}</div>`;
+ }
+ return `<div class="storytitle">Atelier PaulineB</div>
+ <div class="storysub">CRÉNEAUX DISPONIBLES · ${M[m].toUpperCase()} ${y}</div>
+ <div class="igweek">${W.map(x=>`<div>${x}</div>`).join("")}</div>
+ <div class="iggrid">${cells}</div>
+ <div class="igfoot">💌 Réservation en message privé</div>
+ <div class="iglegend">
+   <div><i class="dot all"></i>Toutes prestations</div>
+   <div><i class="dot semi"></i>Semi permanent (mains ou pieds)</div>
+   <div><i class="dot gainage"></i>Gainage</div>
+   <div><i class="dot jap"></i>Manucure japonaise uniquement</div>
+ </div>`;
+}
+ig.onclick=()=>{
+ const y=view.getFullYear(),m=view.getMonth();
+ story.innerHTML=buildInstagramPreview(y,m);
+ igCard.classList.add("show");
+};
+close.onclick=()=>igCard.classList.remove("show");
+const slotsEl=document.getElementById("slots");render();
+</script></main>
+</main>
+
+<script>
+function escSvg(v){
+  return String(v).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;");
+}
+function exportInstagram(){
+ const y=view.getFullYear(),m=view.getMonth(),W0=1080,H0=1920;
+ const gx=65, gy=455, gap=8, cols=7, cw=(W0-2*gx-gap*6)/7, ch=225;
+ const first=(new Date(y,m,1).getDay()+6)%7,total=new Date(y,m+1,0).getDate();
+ const colors={all:["#dfeedd","#477c52"],semi:["#f6cbd8","#9b4e67"],gainage:["#dfcff2","#73529a"],jap:["#f0dcc2","#966b42"]};
+ let svg=`<svg xmlns="http://www.w3.org/2000/svg" width="${W0}" height="${H0}">
+ <rect width="1080" height="1920" fill="#fff8fa"/>
+ <text x="540" y="125" text-anchor="middle" font-family="Georgia,serif" font-size="62" fill="#33282d">Atelier PaulineB</text>
+ <text x="540" y="175" text-anchor="middle" font-family="Arial,sans-serif" font-size="24" font-weight="800" fill="#33282d">CRÉNEAUX DISPONIBLES · ${M[m].toUpperCase()} ${y}</text>`;
+ ["L","M","M","J","V","S","D"].forEach((x,i)=>svg+=`<text x="${gx+i*(cw+gap)+cw/2}" y="215" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="#88777e">${x}</text>`);
+ for(let n=1;n<=total;n++){
+   const idx=first+n-1,row=Math.floor(idx/7),col=idx%7,x=gx+col*(cw+gap),yy=gy+row*(ch+gap);
+   const k=key(new Date(y,m,n)),a=slots.filter(v=>v.startsWith(k+"|")).map(normalizeSlot).sort((a,b)=>a.start.localeCompare(b.start));
+   svg+=`<rect x="${x}" y="${yy}" rx="18" width="${cw}" height="${ch}" fill="#fff" stroke="#eadde3" stroke-width="3"/><text x="${x+15}" y="${yy+34}" font-family="Arial,sans-serif" font-size="25" font-weight="900" fill="#33282d">${n}</text>`;
+   a.slice(0,3).forEach((z,j)=>{const c=colors[z.type]||colors.all,by=yy+58+j*48;svg+=`<rect x="${x+9}" y="${by}" rx="8" width="${cw-18}" height="36" fill="${c[0]}"/><text x="${x+cw/2}" y="${by+24}" text-anchor="middle" font-family="Arial,sans-serif" font-size="20" font-weight="800" fill="${c[1]}">${z.start}</text>`});
+ }
+ const rows=Math.ceil((first+total)/7), ly=gy+rows*(ch+gap)+35;
+ svg+=`<text x="70" y="${ly}" font-family="Arial,sans-serif" font-size="23" font-weight="800" fill="#33282d">Légende</text>`;
+ const legend=[["all","Toutes prestations"],["semi","Semi permanent (mains ou pieds)"],["gainage","Gainage"],["jap","Manucure japonaise uniquement"]];
+ legend.forEach((z,i)=>{const c=colors[z[0]],yy=ly+35+i*42;svg+=`<circle cx="82" cy="${yy-7}" r="9" fill="${c[0]}" stroke="${c[1]}" stroke-width="1"/><text x="103" y="${yy}" font-family="Arial,sans-serif" font-size="19" fill="#4a3b41">${z[1]}</text>`});
+ svg+=`<text x="540" y="1870" text-anchor="middle" font-family="Arial,sans-serif" font-size="23" font-weight="700" fill="#33282d">💌 Réservation en message privé</text></svg>`;
+ const blob=new Blob([svg],{type:"image/svg+xml;charset=utf-8"}),url=URL.createObjectURL(blob),img=new Image();
+ img.onload=()=>{const c=document.createElement("canvas");c.width=W0;c.height=H0;const ctx=c.getContext("2d");ctx.fillStyle="#fff8fa";ctx.fillRect(0,0,W0,H0);ctx.drawImage(img,0,0);URL.revokeObjectURL(url);c.toBlob(async png=>{const file=new File([png],"Atelier-PaulineB-disponibilites.png",{type:"image/png"});try{if(navigator.share&&navigator.canShare&&navigator.canShare({files:[file]}))await navigator.share({files:[file],title:"Disponibilités Atelier PaulineB"});else{const a=document.createElement("a");a.href=URL.createObjectURL(png);a.download=file.name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1500)}}catch(e){if(e.name!=="AbortError")alert("Impossible d'enregistrer l'image.")}},"image/png")};img.src=url;
+}
+document.addEventListener("DOMContentLoaded",()=>{
+ const b=document.getElementById("exportInsta");
+ if(b) b.onclick=exportInstagram;
+});
+</script>
+</body>
+</html>
